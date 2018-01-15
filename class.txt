@@ -1,0 +1,11 @@
+truck
+class12
+c13-8axle
+class5
+class11
+c7-5axle
+c13-7axle
+c10-6axle
+c8-4axle
+class6
+class9
