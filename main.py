@@ -227,7 +227,8 @@ class LabelTool():
                     self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
 
     def saveImage(self):
-        with open(self.labelfilename, 'w') as f:
+        print self.labelfilename+".gt"
+        with open(self.labelfilename+".gt", 'w') as f:
             f.write('%d\n' %len(self.bboxList))
             for bbox in self.bboxList:
                 f.write(' '.join(map(str, bbox)) + '\n')
