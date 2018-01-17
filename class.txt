@@ -6,8 +6,8 @@ class7-5axle
 class7-6axle
 class7-7axle
 class7-more
-c8-3axle
-c8-4axle
+class8-3axle
+class8-4axle
 class9
 class10-6axle
 class10-more
