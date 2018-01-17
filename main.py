@@ -156,7 +156,7 @@ class LabelTool():
         self.imageList = glob.glob(os.path.join(self.imageDir, '*.png'))
         #print self.imageList
         if len(self.imageList) == 0:
-            print 'No .JPG images found in the specified dir!'
+            print 'No .png images found in the specified dir!'
             return
 
         # default to the 1st image in the collection
