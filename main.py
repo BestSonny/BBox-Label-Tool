@@ -8,6 +8,7 @@
 from __future__ import division
 from Tkinter import *
 import tkMessageBox
+import tkFileDialog
 from PIL import Image, ImageTk
 import ttk
 import os
@@ -62,8 +63,8 @@ class LabelTool():
         self.label.grid(row = 0, column = 0, sticky = E)
         self.entry = Entry(self.frame)
         self.entry.grid(row = 0, column = 1, sticky = W+E)
-        self.ldBtn = Button(self.frame, text = "Load", command = self.loadDir)
-        self.ldBtn.grid(row = 0, column = 2,sticky = W+E)
+        self.BrowseBtn = Button(self.frame, text = "Browse", command = self.BrowseDir)
+        self.BrowseBtn.grid(row = 0, column = 2,sticky = W+E)
 
         # main panel for labeling
         self.mainPanel = Canvas(self.frame, cursor='tcross')
@@ -100,10 +101,12 @@ class LabelTool():
         self.btnDel.grid(row = 5, column = 2, sticky = W+E+N)
         self.btnClear = Button(self.frame, text = 'ClearAll', command = self.clearBBox)
         self.btnClear.grid(row = 6, column = 2, sticky = W+E+N)
+        self.btnHelp =  Button(self.frame, text = 'Help', command = self.Help)
+        self.btnHelp.grid(row = 7, column = 2, sticky = W+E+N)
 
         # control panel for image navigation
         self.ctrPanel = Frame(self.frame)
-        self.ctrPanel.grid(row = 7, column = 1, columnspan = 2, sticky = W+E)
+        self.ctrPanel.grid(row = 8, column = 1, columnspan = 2, sticky = W+E)
         self.prevBtn = Button(self.ctrPanel, text='<< Prev', width = 10, command = self.prevImage)
         self.prevBtn.pack(side = LEFT, padx = 5, pady = 3)
         self.nextBtn = Button(self.ctrPanel, text='Next >>', width = 10, command = self.nextImage)
@@ -137,11 +140,14 @@ class LabelTool():
 
         # for debugging
 ##        self.setImage()
-##        self.loadDir()
+##        self.BrowseDir()
 
-    def loadDir(self, dbg = False):
+    def BrowseDir(self, dbg = False):
+        folder = tkFileDialog.askdirectory(initialdir="./Images",title='Please select a gallery from images!')
         if not dbg:
-            s = self.entry.get()
+            s = folder.rpartition('/')[2]
+            self.entry.delete(0,'end')
+            self.entry.insert(0,s)
             self.parent.focus()
             self.category = int(s)
         else:
@@ -290,6 +296,9 @@ class LabelTool():
         self.listbox.delete(0, len(self.bboxList))
         self.bboxIdList = []
         self.bboxList = []
+
+    def Help(self):
+        tkMessageBox.showinfo("About", "Truck Classification Developed By Pan He")
 
     def prevImage(self, event = None):
         self.saveImage()
