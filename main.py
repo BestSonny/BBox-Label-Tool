@@ -71,7 +71,7 @@ class LabelTool():
         self.gallery = StringVar()
         self.entry = ttk.Combobox(self.browsePanel,state='readonly',textvariable=self.gallery)
         self.entry.pack(side = LEFT, ipadx = 85)
-        self.galleries = [name for name in os.listdir(".\Images")]
+        self.galleries = [name for name in os.listdir("./Images")]
         self.entry['values'] = self.galleries
         self.LoadBtn = Button(self.browsePanel, text = "Load", command = self.LoadDir)
         self.LoadBtn.pack(side = LEFT, ipadx = 5)
