@@ -48,7 +48,13 @@ class LabelTool():
         self.tkimg = None
         self.currentLabelclass = ''
         self.cla_can_temp = []
+        self.trac_can_temp = []
+        self.hazmatVar = StringVar()
+        self.refVar = StringVar()
+        self.loadVar = StringVar()
         self.classcandidate_filename = 'class.txt'
+        self.tractortype_filename = 'tractortype.txt'
+        self.deletedInImage=0
 
         # initialize mouse state
         self.STATE = {}
@@ -86,33 +92,87 @@ class LabelTool():
         self.parent.bind("d", self.nextImage) # press 'd' to go forward
         self.mainPanel.pack()
 
+        # showing bbox info & delete bbox
+        self.lb1 = Label(self.labelFrame, text = 'Bounding boxes:')
+        self.lb1.pack()
+        self.listbox = Listbox(self.labelFrame, width = 45, height = 12)
+        self.listbox.pack()
+        self.deleteFrame = Frame(self.labelFrame)
+        self.deleteFrame.pack(pady = 5)
+        self.btnDel = Button(self.deleteFrame, text = 'Delete', command = self.delBBox)
+        self.btnDel.pack( padx= 5, ipadx = 10, side = LEFT)
+        self.btnClear = Button(self.deleteFrame, text = 'Delete All', command = self.clearBBox)
+        self.btnClear.pack(padx= 5, side = LEFT)
+        self.btnclass = Button(self.labelFrame, text = 'Change Selected Label', command = self.setClass)
+        self.btnclass.pack(pady = (0,15), ipadx = 3)
+
         # choose class
+        self.classnameLabel = Label(self.labelFrame, text = 'Choose Class from Dropdown:')
+        self.classnameLabel.pack(pady = 1)
         self.classname = StringVar()
         self.classcandidate = ttk.Combobox(self.labelFrame,state='readonly',textvariable=self.classname)
-        self.classcandidate.pack()
+        self.classcandidate.pack(fill = X)
         if os.path.exists(self.classcandidate_filename):
         	with open(self.classcandidate_filename) as cf:
         		for line in cf.readlines():
         			# print line
         			self.cla_can_temp.append(line.strip('\n'))
-        #print self.cla_can_temp
+
+        # Choose a Tractor type
+        self.tractornameLabel = Label(self.labelFrame, text = 'Choose Tractor Type from Dropdown:')
+        self.tractornameLabel.pack(pady = 1)
+        self.tractorname = StringVar()
+        self.tractorcandidate = ttk.Combobox(self.labelFrame,state='readonly',textvariable=self.tractorname)
+        self.tractorcandidate.pack(fill = X)
+        if os.path.exists(self.tractortype_filename):
+        	with open(self.tractortype_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.trac_can_temp.append(line.strip('\n'))
+
+        #print self.cla_can_temp and self.truck_can_temp
         self.classcandidate['values'] = self.cla_can_temp
         self.classcandidate.current(0)
-        self.currentLabelclass = self.classcandidate.get() #init
-        self.btnclass = Button(self.labelFrame, text = 'ConfirmClass', command = self.setClass)
-        self.btnclass.pack(fill = X)
+        self.tractorcandidate['values'] = self.trac_can_temp
+        self.tractorcandidate.current(0)
 
-        # showing bbox info & delete bbox
-        self.lb1 = Label(self.labelFrame, text = 'Bounding boxes:')
-        self.lb1.pack()
-        self.listbox = Listbox(self.labelFrame, width = 22, height = 12)
-        self.listbox.pack()
-        self.btnDel = Button(self.labelFrame, text = 'Delete', command = self.delBBox)
-        self.btnDel.pack(fill = X)
-        self.btnClear = Button(self.labelFrame, text = 'ClearAll', command = self.clearBBox)
-        self.btnClear.pack(fill = X)
+        #Add Hazmat, refrigerant, and wide load selection
+        choices = [("Yes", "Y"), ("No", "N"), ("Unknown", "U")]
+        self.haz = Label(self.labelFrame, text = 'Hazmat Truck')
+        self.haz.pack(pady = 1)
+        self.hazFrame = Frame(self.labelFrame)
+        self.hazFrame.pack(pady = 1)
+        self.hazmatVar.set("U")
+        for text, choice in choices:
+            hazradiobutton = Radiobutton(self.hazFrame, text=text, variable=self.hazmatVar, value=choice)
+            hazradiobutton.pack(side = LEFT)
+
+        self.ref = Label(self.labelFrame, text = 'Refrigerant Unit')
+        self.ref.pack()
+        self.refFrame = Frame(self.labelFrame)
+        self.refFrame.pack(pady = 1)
+        self.refVar.set("U")
+        for text, choice in choices:
+            refradiobutton = Radiobutton(self.refFrame, text=text, variable=self.refVar, value=choice)
+            refradiobutton.pack(side = LEFT)
+
+        self.load = Label(self.labelFrame, text = 'Wide load')
+        self.load.pack()
+        self.loadFrame = Frame(self.labelFrame)
+        self.loadFrame.pack(pady = 1)
+        self.loadVar.set("U")
+        for text, choice in choices:
+            loadradiobutton = Radiobutton(self.loadFrame, text=text, variable=self.loadVar, value=choice)
+            loadradiobutton.pack(side = LEFT)
+
+        #Initialize class variables and add help button
         self.btnHelp =  Button(self.labelFrame, text = 'Help', command = self.Help)
-        self.btnHelp.pack(fill = X)
+        self.btnHelp.pack(ipadx=10, anchor = CENTER)
+        self.currentLabelclass = self.classcandidate.get()
+        self.currentTractorType = self.tractorcandidate.get()
+        self.currentHaz = self.hazmatVar.get()
+        self.currentRef = self.refVar.get()
+        self.currentLoad = self.loadVar.get()
 
         # control panel for image navigation
         self.ctrPanel = Frame(self.imageFrame)
@@ -210,6 +270,7 @@ class LabelTool():
         self.mainPanel.config(width = max(self.tkimg.width(), 400), height = max(self.tkimg.height(), 400))
         self.mainPanel.create_image(0, 0, image = self.tkimg, anchor=NW)
         self.progLabel.config(text = "%04d/%04d" %(self.cur, self.total))
+        self.deletedInImage=0
 
         # load labels
         self.clearBBox()
@@ -232,17 +293,23 @@ class LabelTool():
                         continue
                     # tmp = [int(t.strip()) for t in line.split()]
                     tmp = line.split()
-                    #print tmp
+                    #Draw rectangle and class name in the image
                     self.bboxList.append(tuple(tmp))
                     tmpId = self.mainPanel.create_rectangle(int(tmp[0]), int(tmp[1]), \
                                                             int(tmp[2]), int(tmp[3]), \
                                                             width = 2, \
                                                             outline = COLORS[(len(self.bboxList)-1) % len(COLORS)])
-                    # print tmpId
                     self.bboxIdList.append(tmpId)
-                    self.listbox.insert(END, '%s : (%d, %d) -> (%d, %d)' %(tmp[4],int(tmp[0]), int(tmp[1]), \
-                    												  int(tmp[2]), int(tmp[3])))
-                    self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
+                    if (int(tmp[1])-10>0):
+                        tmpId = self.mainPanel.create_text((int(tmp[0])+int(tmp[2]))/2, int(tmp[1])-10, fill = COLORS[(len(self.bboxList)-1) % len(COLORS)], \
+                                                            text = tmp[4], font = "6")
+                    else:
+                        tmpId = self.mainPanel.create_text((int(tmp[0])+int(tmp[2]))/2, int(tmp[1])+10, fill = COLORS[(len(self.bboxList)-1) % len(COLORS)], \
+                                                            text = tmp[4], font = "6")
+                    self.bboxIdList.append(tmpId)
+                    #Insert class into listbo
+                    self.listbox.insert(END, '%s-%s, H : %s, R : %s, W : %s' %(tmp[4],tmp[5],tmp[6],tmp[7],tmp[8]))
+                    self.listbox.itemconfig(len(self.bboxList) - 1, fg = COLORS[(len(self.bboxList) - 1) % len(COLORS)])
 
     def saveImage(self):
         if self.notCorrected:
@@ -263,13 +330,26 @@ class LabelTool():
         if self.STATE['click'] == 0:
             self.STATE['x'], self.STATE['y'] = event.x, event.y
         else:
+            self.currentLabelclass = self.classcandidate.get()
+            self.currentTractorType = self.tractorcandidate.get()
+            self.currentHaz = self.hazmatVar.get()
+            self.currentRef = self.refVar.get()
+            self.currentLoad = self.loadVar.get()
             x1, x2 = min(self.STATE['x'], event.x), max(self.STATE['x'], event.x)
             y1, y2 = min(self.STATE['y'], event.y), max(self.STATE['y'], event.y)
-            self.bboxList.append((x1, y1, x2, y2, self.currentLabelclass))
+            self.bboxList.append((x1, y1, x2, y2, self.currentLabelclass, self.currentTractorType, self.currentHaz, self.currentRef, self.currentLoad))
+            self.bboxIdList.append(self.bboxId)
+            if (y1-10>0):
+                self.bboxId = self.mainPanel.create_text((x1+x2)/2, y1-10, fill = COLORS[(len(self.bboxList)-1+self.deletedInImage) % len(COLORS)], \
+                                                    text = self.currentLabelclass, font = "6")
+            else:
+                self.bboxId = self.mainPanel.create_text((x1+x2)/2, y1+10, fill = COLORS[(len(self.bboxList)-1+self.deletedInImage) % len(COLORS)], \
+                                                    text = self.currentLabelclass, font = "6")
             self.bboxIdList.append(self.bboxId)
             self.bboxId = None
-            self.listbox.insert(END, '%s : (%d, %d) -> (%d, %d)' %(self.currentLabelclass,x1, y1, x2, y2))
-            self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
+            self.listbox.insert(END, '%s-%s, H : %s, R : %s, W : %s' %(self.currentLabelclass,self.currentTractorType,self.currentHaz,self.currentRef, \
+                                                            self.currentLoad))
+            self.listbox.itemconfig(len(self.bboxList) - 1, fg = COLORS[(len(self.bboxList)+self.deletedInImage-1) % len(COLORS)])
 
         self.STATE['click'] = 1 - self.STATE['click']
 
@@ -289,7 +369,7 @@ class LabelTool():
                 self.bboxId = self.mainPanel.create_rectangle(self.STATE['x'], self.STATE['y'], \
                                                                 event.x, event.y, \
                                                                 width = 2, \
-                                                                outline = COLORS[len(self.bboxList) % len(COLORS)])
+                                                                outline = COLORS[(len(self.bboxList)+self.deletedInImage) % len(COLORS)])
 
     def cancelBBox(self, event):
         if 1 == self.STATE['click']:
@@ -303,10 +383,13 @@ class LabelTool():
         if len(sel) != 1 :
             return
         idx = int(sel[0])
-        self.mainPanel.delete(self.bboxIdList[idx])
-        self.bboxIdList.pop(idx)
+        self.mainPanel.delete(self.bboxIdList[2*idx])
+        self.mainPanel.delete(self.bboxIdList[2*idx+1])
+        self.bboxIdList.pop(2*idx+1)
+        self.bboxIdList.pop(2*idx)
         self.bboxList.pop(idx)
         self.listbox.delete(idx)
+        self.deletedInImage=self.deletedInImage+1
 
     def clearBBox(self):
         for idx in range(len(self.bboxIdList)):
@@ -314,6 +397,7 @@ class LabelTool():
         self.listbox.delete(0, len(self.bboxList))
         self.bboxIdList = []
         self.bboxList = []
+        self.deletedInImage=0
 
     def Help(self):
         tkMessageBox.showinfo("About", "Truck Classification Developed By Pan He")
@@ -338,28 +422,32 @@ class LabelTool():
             self.loadImage()
 
     def setClass(self):
-        print('here3')
     	self.currentLabelclass = self.classcandidate.get()
-    	print self.labelfilename, 'set label class to :',self.currentLabelclass
+        self.currentTractorType = self.tractorcandidate.get()
+        self.currentHaz = self.hazmatVar.get()
+        self.currentRef = self.refVar.get()
+        self.currentLoad = self.loadVar.get()
         sel = self.listbox.curselection()
         if len(sel) != 1 :
             return
         idx = int(sel[0])
-        x1, y1, x2, y2, _ = self.bboxList[idx]
+        x1, y1, x2, y2 = self.bboxList[idx][:4]
         x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
-        self.mainPanel.delete(self.bboxIdList[idx])
-        self.bboxIdList.pop(idx)
-        self.bboxList.pop(idx)
+        self.mainPanel.delete(self.bboxIdList[2*idx+1])
         self.listbox.delete(idx)
-        self.bboxList.append((x1, y1, x2, y2, self.currentLabelclass))
-        self.bboxId = self.mainPanel.create_rectangle(x1, y1, \
-                                                x2, y2, \
-                                                width = 2, \
-                                                outline = COLORS[(len(self.bboxList)-1) % len(COLORS)])
-        self.bboxIdList.append(self.bboxId)
+        self.bboxList[idx]=(x1, y1, x2, y2, self.currentLabelclass, self.currentTractorType, self.currentHaz, self.currentRef, self.currentLoad)
+        if (y1-10>0):
+            self.bboxId = self.mainPanel.create_text((x1+x2)/2, y1-10, fill = COLORS[idx % len(COLORS)], \
+                                                text = self.currentLabelclass, font = "6")
+        else:
+            self.bboxId = self.mainPanel.create_text((x1+x2)/2, y1+10, fill = COLORS[idx % len(COLORS)], \
+                                                text = self.currentLabelclass, font = "6")
+        self.bboxIdList[2*idx+1]=self.bboxId
         self.bboxId = None
-        self.listbox.insert(END, '%s : (%d, %d) -> (%d, %d)' %(self.currentLabelclass,x1, y1, x2, y2))
-        self.listbox.itemconfig(len(self.bboxIdList) - 1, fg = COLORS[(len(self.bboxIdList) - 1) % len(COLORS)])
+        self.listbox.insert(idx, '%s-%s, H : %s, R : %s, W : %s' %(self.currentLabelclass,self.currentTractorType,self.currentHaz,self.currentRef, \
+                                                        self.currentLoad))
+        self.listbox.itemconfig(idx, fg = COLORS[idx % len(COLORS)])
+
 ##    def setImage(self, imagepath = r'test2.png'):
 ##        self.img = Image.open(imagepath)
 ##        self.tkimg = ImageTk.PhotoImage(self.img)
