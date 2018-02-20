@@ -24,7 +24,7 @@ class LabelTool():
     def __init__(self, master):
         # set up the 3 main frames
         self.parent = master
-        self.parent.title("LabelTool")
+        self.parent.title("Truck Classification Tool")
         self.exampleFrame = Frame(self.parent, relief = GROOVE, bd = 1)
         self.exampleFrame.pack(side = LEFT, fill = Y, padx = 2.5, pady = 2.5)
         self.imageFrame = Frame(self.parent, relief = GROOVE, bd = 1)
@@ -117,10 +117,12 @@ class LabelTool():
         self.btnclass.pack(pady = (0,20), ipadx = 3)
 
         # choose class
-        self.classnameLabel = Label(self.labelFrame, text = 'Choose Class from Dropdown:')
+        self.classEditPanel = Frame(self.labelFrame)
+        self.classEditPanel.pack(pady = (5,0), padx=5, fill = BOTH)
+        self.classnameLabel = Label(self.classEditPanel, text = 'Choose Class from Dropdown:')
         self.classnameLabel.pack(pady = 1)
         self.classname = StringVar()
-        self.classcandidate = ttk.Combobox(self.labelFrame,state='readonly',textvariable=self.classname)
+        self.classcandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.classname)
         self.classcandidate.pack(fill = X)
         self.classcandidate.bind("<<ComboboxSelected>>",self.previewSelectedClass)
         if os.path.exists(self.classcandidate_filename):
@@ -130,10 +132,10 @@ class LabelTool():
         			self.cla_can_temp.append(line.strip('\n'))
 
         # Choose a Tractor type
-        self.tractornameLabel = Label(self.labelFrame, text = 'Choose Tractor Type from Dropdown:')
+        self.tractornameLabel = Label(self.classEditPanel, text = 'Choose Tractor Type from Dropdown:')
         self.tractornameLabel.pack(pady = 1)
         self.tractorname = StringVar()
-        self.tractorcandidate = ttk.Combobox(self.labelFrame,state='readonly',textvariable=self.tractorname)
+        self.tractorcandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.tractorname)
         self.tractorcandidate.pack(fill = X)
         if os.path.exists(self.tractortype_filename):
         	with open(self.tractortype_filename) as cf:
@@ -149,27 +151,27 @@ class LabelTool():
 
         #Add Hazmat, refrigerant, and wide load selection
         choices = [("Yes", "Y"), ("No", "N"), ("Unknown", "U")]
-        self.haz = Label(self.labelFrame, text = 'Hazmat Truck')
+        self.haz = Label(self.classEditPanel, text = 'Hazmat Truck')
         self.haz.pack(pady = 1)
-        self.hazFrame = Frame(self.labelFrame)
+        self.hazFrame = Frame(self.classEditPanel)
         self.hazFrame.pack(pady = 1)
         self.hazmatVar.set("U")
         for text, choice in choices:
             hazradiobutton = Radiobutton(self.hazFrame, text=text, variable=self.hazmatVar, value=choice)
             hazradiobutton.pack(side = LEFT)
 
-        self.ref = Label(self.labelFrame, text = 'Refrigerant Unit')
+        self.ref = Label(self.classEditPanel, text = 'Refrigerant Unit')
         self.ref.pack()
-        self.refFrame = Frame(self.labelFrame)
+        self.refFrame = Frame(self.classEditPanel)
         self.refFrame.pack(pady = 1)
         self.refVar.set("U")
         for text, choice in choices:
             refradiobutton = Radiobutton(self.refFrame, text=text, variable=self.refVar, value=choice)
             refradiobutton.pack(side = LEFT)
 
-        self.load = Label(self.labelFrame, text = 'Wide load')
+        self.load = Label(self.classEditPanel, text = 'Wide load')
         self.load.pack()
-        self.loadFrame = Frame(self.labelFrame)
+        self.loadFrame = Frame(self.classEditPanel)
         self.loadFrame.pack(pady = 1)
         self.loadVar.set("U")
         for text, choice in choices:
@@ -206,19 +208,25 @@ class LabelTool():
         # example pannel for illustration
         self.egPanel = Frame(self.exampleFrame, border = 10)
         self.egPanel.pack()
-        self.tmpLabel2 = Label(self.egPanel, text = "Selected Box:")
+        self.selectedImagePanel = Frame(self.egPanel, relief="groove", border = 2)
+        self.selectedImagePanel.pack(pady = (0,5))
+        self.classExamplePanel = Frame(self.egPanel, relief="groove", border = 2)
+        self.classExamplePanel.pack(pady = (0,5))
+        self.previewClassPanel = Frame(self.egPanel, relief="groove", border = 2)
+        self.previewClassPanel.pack()
+        self.tmpLabel2 = Label(self.selectedImagePanel, text = "Selected Box: ", relief="ridge", border = 5)
         self.tmpLabel2.pack(side = TOP, pady = 5)
-        self.selectedImage = Canvas(self.egPanel)
+        self.selectedImage = Canvas(self.selectedImagePanel)
         self.selectedImage.pack()
         self.selectedImage.config(width = 300, height = 150)
-        self.tmpLabel3 = Label(self.egPanel, text = "Class Example:")
+        self.tmpLabel3 = Label(self.classExamplePanel, text = "Class Example: ", relief="ridge", border = 5)
         self.tmpLabel3.pack(side = TOP, pady = 5)
-        self.classExample = Canvas(self.egPanel)
+        self.classExample = Canvas(self.classExamplePanel)
         self.classExample.pack()
         self.classExample.config(width = 300, height = 150)
-        self.tmpLabel4 = Label(self.egPanel, text = "Preview Class:")
+        self.tmpLabel4 = Label(self.previewClassPanel, text = "Preview Class: ", relief="ridge", border = 5)
         self.tmpLabel4.pack(side = TOP, pady = 5)
-        self.previewClass = Canvas(self.egPanel)
+        self.previewClass = Canvas(self.previewClassPanel)
         self.previewClass.pack()
         self.previewClass.config(width = 300, height = 150)
 
