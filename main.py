@@ -37,8 +37,6 @@ class LabelTool():
         self.imageDir = ''
         self.imageList= []
         self.imgloaded = 0
-        self.egDir = ''
-        self.egList = []
         self.outDir = ''
         self.cur = 0
         self.total = 0
@@ -124,6 +122,7 @@ class LabelTool():
         self.classname = StringVar()
         self.classcandidate = ttk.Combobox(self.labelFrame,state='readonly',textvariable=self.classname)
         self.classcandidate.pack(fill = X)
+        self.classcandidate.bind("<<ComboboxSelected>>",self.previewSelectedClass)
         if os.path.exists(self.classcandidate_filename):
         	with open(self.classcandidate_filename) as cf:
         		for line in cf.readlines():
@@ -211,17 +210,17 @@ class LabelTool():
         self.tmpLabel2.pack(side = TOP, pady = 5)
         self.selectedImage = Canvas(self.egPanel)
         self.selectedImage.pack()
-        self.selectedImage.config(width = 300, height = 100)
+        self.selectedImage.config(width = 300, height = 150)
         self.tmpLabel3 = Label(self.egPanel, text = "Class Example:")
         self.tmpLabel3.pack(side = TOP, pady = 5)
         self.classExample = Canvas(self.egPanel)
         self.classExample.pack()
-        self.classExample.config(width = 0, height = 0)
+        self.classExample.config(width = 300, height = 150)
         self.tmpLabel4 = Label(self.egPanel, text = "Preview Class:")
         self.tmpLabel4.pack(side = TOP, pady = 5)
         self.previewClass = Canvas(self.egPanel)
         self.previewClass.pack()
-        self.previewClass.config(width = 0, height = 0)
+        self.previewClass.config(width = 300, height = 150)
 
         # display mouse position
         self.disp = Label(self.ctrPanel, text='')
@@ -252,9 +251,6 @@ class LabelTool():
         self.outDir = os.path.join(r'./Labels', '%03d' %(self.category))
         if not os.path.exists(self.outDir):
             os.mkdir(self.outDir)
-
-        # load example directory
-        self.egDir = os.path.join(r'./Examples/demo')
 
         self.loadImage()
         print '%d images loaded from %s' %(self.total, s)
@@ -449,18 +445,38 @@ class LabelTool():
         self.listbox.itemconfig(idx, fg = COLORS[idx % len(COLORS)])
 
     def selectLabel(self, evt):
+        #Check if selection is valid
         sel = self.listbox.curselection()
         if len(sel) != 1 :
             return
         idx = int(sel[0])
+        #Display the cropped part of the image
         x1, y1, x2, y2 = self.bboxList[idx][:4]
         x1, y1, x2, y2 = int(x1), int(y1), int(x2), int(y2)
         imagepath = self.imageList[self.cur - 1]
         cropImage = Image.open(imagepath)
         cropImage = cropImage.crop((x1, y1, x2, y2))
-        cropImage.thumbnail((300,100), Image.ANTIALIAS)
+        cropImage.thumbnail((300,150), Image.ANTIALIAS)
         self.exampleImage = ImageTk.PhotoImage(cropImage)
-        self.selectedImage.create_image(150, 50, image = self.exampleImage, anchor=CENTER)
+        self.selectedImage.create_image(150, 75, image = self.exampleImage, anchor=CENTER)
+        #Display the example of the class in the image
+        selectedClass = self.bboxList[idx][4].split("-")
+        selectedClass = selectedClass[0] + ".png"
+        imagepath = os.path.join(r'./Examples/Classes',selectedClass)
+        classExampleImage = Image.open(imagepath)
+        classExampleImage.thumbnail((300,150), Image.ANTIALIAS)
+        self.exampleImage2 = ImageTk.PhotoImage(classExampleImage)
+        self.classExample.create_image(150, 75, image = self.exampleImage2, anchor=CENTER)
+
+    def previewSelectedClass(self, evt):
+        #Display the example of the class in the image
+        selectedClass = self.classcandidate.get().split("-")
+        selectedClass = selectedClass[0] + ".png"
+        imagepath = os.path.join(r'./Examples/Classes',selectedClass)
+        classExampleImage = Image.open(imagepath)
+        classExampleImage.thumbnail((300,150), Image.ANTIALIAS)
+        self.exampleImage3 = ImageTk.PhotoImage(classExampleImage)
+        self.previewClass.create_image(150, 75, image = self.exampleImage3, anchor=CENTER)
 
 if __name__ == '__main__':
     root = Tk()
