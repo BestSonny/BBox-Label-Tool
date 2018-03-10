@@ -1,0 +1,10 @@
+NA
+Day_Cab
+Sleeper
+Bucket_Truck
+Dump_Truck
+Cement_Truck
+Flatbed_Truck
+Roll_Off_Truck
+Box_Truck
+Unknown
