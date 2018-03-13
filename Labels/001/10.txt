@@ -1,2 +1,2 @@
 0
-102 220 223 291 truck
+102 220 223 291 truck Bed Yes Yes Yes

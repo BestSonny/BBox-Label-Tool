@@ -1,0 +1,8 @@
+NA
+Flatbed
+Tandum
+Enclosed
+Chassis
+Tank
+Specialty
+Unknown
