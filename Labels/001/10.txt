@@ -1,2 +1,2 @@
-0
-102 220 223 291 truck Bed Yes Yes Yes
+1
+112 61 409 151 class9 NA NA NA U U U
