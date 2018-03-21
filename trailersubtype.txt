@@ -1,0 +1,10 @@
+NA
+Flatbed
+LowBoy
+Step/Drop_Deck
+Extendable_Flatbed_Stretch
+Stretch_Single_Drop_Deck
+Stretch_Double_Drop
+Extendable_Double_Drop
+RGN
+Stretch_RGN
