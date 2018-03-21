@@ -14,6 +14,7 @@ import ttk
 import os
 import glob
 import random
+import distutils.dir_util
 
 # colors for the bboxes
 COLORS = ['red', 'blue', 'olive', 'teal', 'cyan', 'green', 'black']
@@ -334,6 +335,12 @@ class LabelTool():
         self.saveLabelPath = os.path.join(r'./Corrected/%03d/Labels' %(self.category),newlabelname)
         self.deleteImagePath = os.path.join(r'./Deleted/%03d/Images' %(self.category),self.imagename+'.png')
         self.deleteLabelPath = os.path.join(r'./Deleted/%03d/Labels' %(self.category),self.imagename+'.txt')
+        #creat folder
+        distutils.dir_util.mkpath(r'./Corrected/%03d/Images' %(self.category))
+        distutils.dir_util.mkpath(r'./Corrected/%03d/Labels' %(self.category))
+        distutils.dir_util.mkpath(r'./Deleted/%03d/Images' %(self.category))
+        distutils.dir_util.mkpath(r'./Deleted/%03d/Labels' %(self.category))
+        
         self.newlabelfilename = os.path.join(self.outDir, newlabelname)
         if os.path.exists(self.newlabelfilename):
             self.labelfilename = self.newlabelfilename
