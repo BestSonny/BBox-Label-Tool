@@ -1,0 +1,7 @@
+Car_Hauler
+Enlcosed_Car_Hauler
+Timber
+Livestock
+Dump
+Bottom_Dump
+Grain_Hopper

@@ -1,0 +1,6 @@
+Fuel_Tank
+Food_Grade_Tank
+Dry_Bulk_Pneumatic
+High_Pressure_Tank
+Cryogenic_Tank
+Compressed_Natural_Gas
