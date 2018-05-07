@@ -713,6 +713,21 @@ class LabelTool():
         self.img = Image.open(imagepath)
 
 
+    def askSaveQuestion(self):
+        result = tkMessageBox.askquestion("Save Changes", "Save Changes Before Continuing?", icon="warning", type="yesnocancel")
+        if result == 'yes':
+            self.saveImage()
+            return True
+        if result == 'no':
+            return True
+        if result == 'cancel':
+            return False
+
+    def askDeleteQuestion(self):
+        result = tkMessageBox.askquestion("Delete", "Delete the Current Image?", icon="warning", type="yesno")
+        if result == 'yes':
+            self.deleteImage()
+
 if __name__ == '__main__':
     root = Tk()
     tool = LabelTool(root)
