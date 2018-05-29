@@ -1,2 +1,6 @@
 1
+<<<<<<< HEAD
 324 139 453 199 others NA NA NA N N N
+=======
+324 139 453 199 class5 NA NA NA U U U
+>>>>>>> 7a705d0cb62cb2243b775f1735b280fa0940f48c

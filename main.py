@@ -54,11 +54,13 @@ class LabelTool():
         self.trac_can_temp = []
         self.trail_can_temp = []
         self.trailsub_can_temp = []
+
         self.flatbedsub_can_temp = []
         self.tanksub_can_temp = []
         self.chassissub_can_temp = []
         self.enclosedsub_can_temp = []
         self.specialtysub_can_temp = []
+
         self.hazmatVar = StringVar()
         self.refVar = StringVar()
         self.loadVar = StringVar()
@@ -66,11 +68,13 @@ class LabelTool():
         self.tractortype_filename = 'tractortype.txt'
         self.trailertype_filename = 'trailertype.txt'
         self.trailersubtype_filename = 'trailersubtype.txt'
+
         self.flatbedsubtype_filename = 'flatbedsubtype.txt'
         self.tanksubtype_filename = 'tanksubtype.txt'
         self.enclosedsubtype_filename = 'enclosedsubtype.txt'
         self.chassissubtype_filename = 'chassissubtype.txt'
         self.specialtysubtype_filename = 'specialtysubtype.txt'
+
         self.deletedInImage=0
         self.changed=False
         self.saved=False
@@ -100,7 +104,9 @@ class LabelTool():
         self.label.pack(side = LEFT)
         self.gallery = StringVar()
         self.entry = ttk.Combobox(self.browsePanel,state='readonly',textvariable=self.gallery)
+
         self.entry.pack(side = LEFT, ipadx = 80)
+
         self.galleries = [name for name in os.listdir("./Images")]
         self.entry['values'] = self.galleries
         self.LoadBtn = Button(self.browsePanel, text = "Load", command = self.LoadDir)
@@ -187,7 +193,9 @@ class LabelTool():
         self.trailername = StringVar()
         self.trailercandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.trailername)
         self.trailercandidate.pack(fill = X)
+
         self.trailercandidate.bind("<<ComboboxSelected>>",self.editSubtypeChoices)
+
         if os.path.exists(self.trailertype_filename):
         	with open(self.trailertype_filename) as cf:
         		for line in cf.readlines():
@@ -205,6 +213,7 @@ class LabelTool():
         		for line in cf.readlines():
         			# print line
         			self.trailsub_can_temp.append(line.strip('\n'))
+
         if os.path.exists(self.flatbedsubtype_filename):
         	with open(self.flatbedsubtype_filename) as cf:
         		for line in cf.readlines():
@@ -334,6 +343,7 @@ class LabelTool():
         # self.disp = Label(self.ctrPanel, text='')
         # self.disp.pack(side = LEFT)
 
+
     def uploadDir(self):
         video = self.uploadEntry.get()
         print(video)
@@ -342,6 +352,7 @@ class LabelTool():
         #    print("Upload Succeeded")
         #except:
         #    print("Upload failed")
+
 
     def LoadDir(self, dbg = False):
         if not dbg:
@@ -395,6 +406,7 @@ class LabelTool():
         self.imagename = os.path.split(imagepath)[-1].split('.')[0]
         self.notCorrected = True
         newlabelname = self.imagename + '.txt.gt'
+
         self.saveImagePath = os.path.join(r'./Corrected/%s/Images' %(self.category),self.imagename+'.png')
         self.saveLabelPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),newlabelname)
         self.deleteImagePath = os.path.join(r'./Deleted/%s/Images' %(self.category),self.imagename+'.png')
@@ -405,6 +417,7 @@ class LabelTool():
         distutils.dir_util.mkpath(r'./Deleted/%s/Images' %(self.category))
         distutils.dir_util.mkpath(r'./Deleted/%s/Labels' %(self.category))
 
+
         self.newlabelfilename = os.path.join(self.outDir, newlabelname)
         if os.path.exists(self.newlabelfilename):
             self.labelfilename = self.newlabelfilename
@@ -413,7 +426,9 @@ class LabelTool():
         else:
             labelname = self.imagename + '.txt'
             self.labelfilename = os.path.join(self.outDir, labelname)
+
             self.saveLabelPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),labelname)
+
             self.status.config(text="Not Corrected", fg="red")
         bbox_cnt = 0
         if os.path.exists(self.labelfilename):
@@ -641,17 +656,21 @@ class LabelTool():
         #Display the example of the class in the image
         selectedClass = self.bboxList[idx][4].split("-")
         selectedClass = selectedClass[0] + ".png"
+
         if ((selectedClass!="unknown.png") and (selectedClass!="Unknown.png")):
           imagepath = os.path.join(r'./Examples/Classes',selectedClass)
           classExampleImage = Image.open(imagepath)
           classExampleImage.thumbnail((300,150), Image.ANTIALIAS)
           self.exampleImage2 = ImageTk.PhotoImage(classExampleImage)
           self.classExample.create_image(150, 75, image = self.exampleImage2, anchor=CENTER)
+
         #Show All Label Data in Edit Frame
         self.classcandidate.set(classtype)
         self.tractorcandidate.set(tractortype)
         self.trailercandidate.set(trailertype)
+
         self.trailercandidate.event_generate("<<ComboboxSelected>>")
+
         self.trailersubcandidate.set(trailersubtype)
         self.hazmatVar.set(hazmat)
         self.refVar.set(refrigerant)
@@ -712,6 +731,21 @@ class LabelTool():
         imagepath = self.imageList[self.cur - 1]
         self.img = Image.open(imagepath)
 
+
+    def askSaveQuestion(self):
+        result = tkMessageBox.askquestion("Save Changes", "Save Changes Before Continuing?", icon="warning", type="yesnocancel")
+        if result == 'yes':
+            self.saveImage()
+            return True
+        if result == 'no':
+            return True
+        if result == 'cancel':
+            return False
+
+    def askDeleteQuestion(self):
+        result = tkMessageBox.askquestion("Delete", "Delete the Current Image?", icon="warning", type="yesno")
+        if result == 'yes':
+            self.deleteImage()
 
 if __name__ == '__main__':
     root = Tk()
