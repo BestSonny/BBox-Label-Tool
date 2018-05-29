@@ -347,12 +347,12 @@ class LabelTool():
         if not dbg:
             s = self.entry.get()
             self.parent.focus()
-            self.category = int(s)
+            self.category = s
         else:
             s = r'D:\workspace\python\labelGUI'
 
         # get image list
-        self.imageDir = os.path.join(r'./Images', '%03d' %(self.category))
+        self.imageDir = os.path.join(r'./Images', '%s' %(self.category))
         self.imageList = glob.glob(os.path.join(self.imageDir, '*.png'))
 
         #print self.imageList
@@ -365,7 +365,7 @@ class LabelTool():
         self.total = len(self.imageList)
 
          # set up output dir
-        self.outDir = os.path.join(r'./Labels', '%03d' %(self.category))
+        self.outDir = os.path.join(r'./Labels', '%s' %(self.category))
         if not os.path.exists(self.outDir):
             os.mkdir(self.outDir)
 
@@ -395,15 +395,15 @@ class LabelTool():
         self.imagename = os.path.split(imagepath)[-1].split('.')[0]
         self.notCorrected = True
         newlabelname = self.imagename + '.txt.gt'
-        self.saveImagePath = os.path.join(r'./Corrected/%03d/Images' %(self.category),self.imagename+'.png')
-        self.saveLabelPath = os.path.join(r'./Corrected/%03d/Labels' %(self.category),newlabelname)
-        self.deleteImagePath = os.path.join(r'./Deleted/%03d/Images' %(self.category),self.imagename+'.png')
-        self.deleteLabelPath = os.path.join(r'./Deleted/%03d/Labels' %(self.category),self.imagename+'.txt')
+        self.saveImagePath = os.path.join(r'./Corrected/%s/Images' %(self.category),self.imagename+'.png')
+        self.saveLabelPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),newlabelname)
+        self.deleteImagePath = os.path.join(r'./Deleted/%s/Images' %(self.category),self.imagename+'.png')
+        self.deleteLabelPath = os.path.join(r'./Deleted/%s/Labels' %(self.category),self.imagename+'.txt')
         #creat folder
-        distutils.dir_util.mkpath(r'./Corrected/%03d/Images' %(self.category))
-        distutils.dir_util.mkpath(r'./Corrected/%03d/Labels' %(self.category))
-        distutils.dir_util.mkpath(r'./Deleted/%03d/Images' %(self.category))
-        distutils.dir_util.mkpath(r'./Deleted/%03d/Labels' %(self.category))
+        distutils.dir_util.mkpath(r'./Corrected/%s/Images' %(self.category))
+        distutils.dir_util.mkpath(r'./Corrected/%s/Labels' %(self.category))
+        distutils.dir_util.mkpath(r'./Deleted/%s/Images' %(self.category))
+        distutils.dir_util.mkpath(r'./Deleted/%s/Labels' %(self.category))
 
         self.newlabelfilename = os.path.join(self.outDir, newlabelname)
         if os.path.exists(self.newlabelfilename):
@@ -413,7 +413,7 @@ class LabelTool():
         else:
             labelname = self.imagename + '.txt'
             self.labelfilename = os.path.join(self.outDir, labelname)
-            self.saveLabelPath = os.path.join(r'./Corrected/%03d/Labels' %(self.category),labelname)
+            self.saveLabelPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),labelname)
             self.status.config(text="Not Corrected", fg="red")
         bbox_cnt = 0
         if os.path.exists(self.labelfilename):
