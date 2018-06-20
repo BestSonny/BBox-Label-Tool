@@ -1,6 +1,2 @@
 1
-<<<<<<< HEAD
 73 46 474 154 class9 Sleeper Enclosed NA N Y N
-=======
-74 47 471 154 class9 Sleeper Flatbed Flatbed N Y N
->>>>>>> 7a705d0cb62cb2243b775f1735b280fa0940f48c
