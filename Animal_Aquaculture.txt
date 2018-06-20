@@ -1,0 +1,6 @@
+Cattle
+Swine
+Poultry_and_Egg
+Sheep_and_Goat
+Horses_and_Other_Equine
+Other_Animal_Production

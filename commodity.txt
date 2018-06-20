@@ -1,0 +1,11 @@
+Unknown
+Empty
+Postal_Service_and_Parcels
+Raw_Materials_Agriculture_Forestry_Fishing
+Mining_Quarrying_and_Oil_and_Gas_Extraction
+Manufacturing_Production
+Retail_Ready_Finished_Goods
+Transportation_and_Other
+Utilities
+Waste Management_and_Remediation_Services
+Construction

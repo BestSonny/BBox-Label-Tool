@@ -1,0 +1,6 @@
+Animal_Based
+Grain_and_Oilseed_Based
+Fruit_and_Vegetable_Based
+Dairy_Based
+Sugar_and_Confectionary
+Seafood_Based

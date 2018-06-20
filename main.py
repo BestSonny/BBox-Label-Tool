@@ -15,6 +15,9 @@ import os
 import glob
 import random
 import distutils.dir_util
+import subprocess
+import time
+
 
 # colors for the bboxes
 COLORS = ['red', 'blue', 'olive', 'teal', 'cyan', 'green', 'black']
@@ -45,6 +48,7 @@ class LabelTool():
         self.imagename = ''
         self.saveImagePath = ''
         self.labelfilename = ''
+        self.comfilename = ''
         self.saveLabelPath = ''
         self.deleteLabelPath= ''
         self.deleteImagePath= ''
@@ -61,6 +65,24 @@ class LabelTool():
         self.enclosedsub_can_temp = []
         self.specialtysub_can_temp = []
 
+        self.commodity_can_temp = []
+        self.commoditysub_can_temp = []
+        self.commoditysubsub_can_temp = []
+
+        self.Raw_Materials_Agriculture_Forestry_Fishing_can_temp = []
+        self.Mining_Quarrying_and_Oil_and_Gas_Extraction_can_temp = []
+        self.Construction_can_temp = []
+        self.Manufacturing_Production_can_temp = []
+        self.Transportation_and_Other_can_temp = []
+        self.Retail_Ready_Finished_Goods_can_temp = []
+
+        self.Crops_can_temp = []
+        self.Animal_Aquaculture_can_temp = []
+        self.Mining_Except_Oil_Gas_can_temp = []
+        self.Food_and_Beverages_can_temp = []
+        self.Plant_Products_NonEdible_can_temp = []
+
+
         self.hazmatVar = StringVar()
         self.refVar = StringVar()
         self.loadVar = StringVar()
@@ -74,6 +96,23 @@ class LabelTool():
         self.enclosedsubtype_filename = 'enclosedsubtype.txt'
         self.chassissubtype_filename = 'chassissubtype.txt'
         self.specialtysubtype_filename = 'specialtysubtype.txt'
+
+        self.commodity_filename = 'commodity.txt'
+        self.commodity_subtype_filename = 'commodity_subtype.txt'
+        self.commodity_subsubtype_filename = 'commodity_subsubtype.txt'
+
+        self.Raw_Materials_Agriculture_Forestry_Fishing_filename = 'Raw_Materials_Agriculture_Forestry_Fishing.txt'
+        self.Mining_Quarrying_and_Oil_and_Gas_Extraction_filename= 'Mining_Quarrying_and_Oil_and_Gas_Extraction.txt'
+        self.Construction_filename= 'Construction.txt'
+        self.Manufacturing_Production_filename= 'Manufacturing_Production.txt'
+        self.Transportation_and_Other_filename= 'Transportation_and_Other.txt'
+        self.Retail_Ready_Finished_Goods_filename= 'Retail_Ready_Finished_Goods.txt'
+
+        self.Crops_filename= 'Crops.txt'
+        self.Animal_Aquaculture_filename= 'Animal_Aquaculture.txt'
+        self.Mining_Except_Oil_Gas_filename= 'Mining_Except_Oil_Gas.txt'
+        self.Food_and_Beverages_filename= 'Food_and_Beverages.txt'
+        self.Plant_Products_NonEdible_filename= 'Plant_Products_NonEdible.txt'
 
         self.deletedInImage=0
         self.changed=False
@@ -92,6 +131,7 @@ class LabelTool():
         self.bboxIdList = []
         self.bboxId = None
         self.bboxList = []
+        self.comList = []
         self.hl = None
         self.vl = None
 
@@ -118,7 +158,7 @@ class LabelTool():
         self.videoGallery = StringVar()
         self.uploadEntry = ttk.Combobox(self.uploadPanel,state='readonly',textvariable=self.videoGallery)
         self.uploadEntry.pack(side = LEFT, ipadx = 56)
-        self.videoGalleries = [name for name in os.listdir("../../../home/fdot/Videos")]
+        self.videoGalleries = [name for name in os.listdir("./Videos")]
         self.uploadEntry['values'] = self.videoGalleries
         self.uploadBtn = Button(self.uploadPanel, text = "Classify", command = self.uploadDir)
         self.uploadBtn.pack(side = LEFT, ipadx = 5)
@@ -159,15 +199,122 @@ class LabelTool():
         self.btnClear.pack(padx= 5, side = LEFT)
         self.btnclass = Button(self.labelFrame, text = 'Change Selected Label', command = self.setClass)
         self.btnclass.pack(pady = (0,20), ipadx = 3)
+        
+        #Commodity and class tabs
+        self.commodities = ttk.Notebook(self.labelFrame)
+        self.commodityEditPanel = Frame(self.commodities)
+        self.commodityEditPanel.pack(pady = (5,0), padx=5, fill = BOTH)
 
+        # Choose commodity
+        self.commoditynameLabel = Label(self.commodityEditPanel, text = 'Commodity')
+        self.commoditynameLabel.pack(pady = (5,1))
+        self.commodityname = StringVar()
+        self.commoditycandidate = ttk.Combobox(self.commodityEditPanel,state='readonly',textvariable=self.commodityname)
+        self.commoditycandidate.pack(fill = X, padx = 5)
+        self.commoditycandidate.bind("<<ComboboxSelected>>",self.editCommoditySubtypeChoices)
+        if os.path.exists(self.commodity_filename):
+        	with open(self.commodity_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.commodity_can_temp.append(line.strip())
+
+        # Choose commodity subtype
+        self.subcommoditynameLabel = Label(self.commodityEditPanel, text = 'Commodity Subtype')
+        self.subcommoditynameLabel.pack(pady = (5,1))
+        self.subcommodityname = StringVar()
+        self.subcommoditycandidate = ttk.Combobox(self.commodityEditPanel,state='readonly',textvariable=self.subcommodityname)
+        self.subcommoditycandidate.pack(fill = X, padx = 5)
+       	self.subcommoditycandidate.bind("<<ComboboxSelected>>",self.editCommoditySubsubtypeChoices)
+        if os.path.exists(self.commodity_subtype_filename):
+        	with open(self.commodity_subtype_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.commoditysub_can_temp.append(line.strip())
+        if os.path.exists(self.Raw_Materials_Agriculture_Forestry_Fishing_filename):
+        	with open(self.Raw_Materials_Agriculture_Forestry_Fishing_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Raw_Materials_Agriculture_Forestry_Fishing_can_temp.append(line.strip())
+        if os.path.exists(self.Mining_Quarrying_and_Oil_and_Gas_Extraction_filename):
+        	with open(self.Mining_Quarrying_and_Oil_and_Gas_Extraction_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Mining_Quarrying_and_Oil_and_Gas_Extraction_can_temp.append(line.strip())
+        if os.path.exists(self.Construction_filename):
+        	with open(self.Construction_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Construction_can_temp.append(line.strip())
+        if os.path.exists(self.Manufacturing_Production_filename):
+        	with open(self.Manufacturing_Production_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Manufacturing_Production_can_temp.append(line.strip())
+        if os.path.exists(self.Transportation_and_Other_filename):
+        	with open(self.Transportation_and_Other_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Transportation_and_Other_can_temp.append(line.strip())
+        if os.path.exists(self.Retail_Ready_Finished_Goods_filename):
+        	with open(self.Retail_Ready_Finished_Goods_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Retail_Ready_Finished_Goods_can_temp.append(line.strip())
+
+        # Choose commodity subsubtype
+        self.subsubcommoditynameLabel = Label(self.commodityEditPanel, text = 'Commodity Subsubtype')
+        self.subsubcommoditynameLabel.pack(pady = (5,1))
+        self.subsubcommodityname = StringVar()
+        self.subsubcommoditycandidate = ttk.Combobox(self.commodityEditPanel,state='readonly',textvariable=self.subsubcommodityname)
+        self.subsubcommoditycandidate.pack(fill = X, padx = 5)
+        if os.path.exists(self.commodity_subsubtype_filename):
+        	with open(self.commodity_subsubtype_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.commoditysubsub_can_temp.append(line.strip())
+        if os.path.exists(self.Crops_filename):
+        	with open(self.Crops_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Crops_can_temp.append(line.strip())
+        if os.path.exists(self.Animal_Aquaculture_filename):
+        	with open(self.Animal_Aquaculture_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Animal_Aquaculture_can_temp.append(line.strip())
+        if os.path.exists(self.Mining_Except_Oil_Gas_filename):
+        	with open(self.Mining_Except_Oil_Gas_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Mining_Except_Oil_Gas_can_temp.append(line.strip())
+        if os.path.exists(self.Food_and_Beverages_filename):
+        	with open(self.Food_and_Beverages_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Food_and_Beverages_can_temp.append(line.strip())
+        if os.path.exists(self.Plant_Products_NonEdible_filename):
+        	with open(self.Plant_Products_NonEdible_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Plant_Products_NonEdible_can_temp.append(line.strip())
+
+
+        #Set commodity currents and values
+        self.commoditycandidate['values'] = self.commodity_can_temp
+        self.commoditycandidate.current(0)
+        self.subcommoditycandidate['values'] = self.commoditysub_can_temp
+        self.subcommoditycandidate.current(0)
+        self.subsubcommoditycandidate['values'] = self.commoditysubsub_can_temp
+        self.subsubcommoditycandidate.current(0)
+        
         # choose class
-        self.classEditPanel = Frame(self.labelFrame)
+        self.classEditPanel = Frame(self.commodities)
         self.classEditPanel.pack(pady = (5,0), padx=5, fill = BOTH)
         self.classnameLabel = Label(self.classEditPanel, text = 'Class')
-        self.classnameLabel.pack(pady = 1)
+        self.classnameLabel.pack(pady = (5,1))
         self.classname = StringVar()
         self.classcandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.classname)
-        self.classcandidate.pack(fill = X)
+        self.classcandidate.pack(fill = X, padx = 5)
         self.classcandidate.bind("<<ComboboxSelected>>",self.previewSelectedClass)
         if os.path.exists(self.classcandidate_filename):
         	with open(self.classcandidate_filename) as cf:
@@ -180,7 +327,7 @@ class LabelTool():
         self.tractornameLabel.pack(pady = 1)
         self.tractorname = StringVar()
         self.tractorcandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.tractorname)
-        self.tractorcandidate.pack(fill = X)
+        self.tractorcandidate.pack(fill = X, padx = 5)
         if os.path.exists(self.tractortype_filename):
         	with open(self.tractortype_filename) as cf:
         		for line in cf.readlines():
@@ -192,7 +339,7 @@ class LabelTool():
         self.trailernameLabel.pack(pady = 1)
         self.trailername = StringVar()
         self.trailercandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.trailername)
-        self.trailercandidate.pack(fill = X)
+        self.trailercandidate.pack(fill = X, padx = 5)
 
         self.trailercandidate.bind("<<ComboboxSelected>>",self.editSubtypeChoices)
 
@@ -202,12 +349,12 @@ class LabelTool():
         			# print line
         			self.trail_can_temp.append(line.strip('\n'))
 
-        # Choose a Trailer type
+        # Choose a Trailer subtype
         self.trailersubnameLabel = Label(self.classEditPanel, text = 'Trailer Subtype')
         self.trailersubnameLabel.pack(pady = 1)
         self.trailersubname = StringVar()
         self.trailersubcandidate = ttk.Combobox(self.classEditPanel,state='readonly',textvariable=self.trailersubname)
-        self.trailersubcandidate.pack(fill = X)
+        self.trailersubcandidate.pack(fill = X, padx = 5)
         if os.path.exists(self.trailersubtype_filename):
         	with open(self.trailersubtype_filename) as cf:
         		for line in cf.readlines():
@@ -273,12 +420,17 @@ class LabelTool():
         self.load = Label(self.classEditPanel, text = 'Wide load')
         self.load.pack()
         self.loadFrame = Frame(self.classEditPanel)
-        self.loadFrame.pack(pady = 1)
+        self.loadFrame.pack(pady = (1,5))
         self.loadVar.set("U")
         for text, choice in choices:
             loadradiobutton = Radiobutton(self.loadFrame, text=text, variable=self.loadVar, value=choice)
             loadradiobutton.pack(side = LEFT)
 
+        #Setup the labeling notebook
+        self.commodities.add(self.classEditPanel, text="Classes")
+        self.commodities.add(self.commodityEditPanel, text="Commodities")
+        self.commodities.pack(fill = X, padx = 3)
+        
         #Buttons to save and delete the images
         self.btnSave = Button(self.labelFrame, text = 'Save Corrected Image', command = self.saveImage)
         self.btnSave.pack( padx= 5, ipadx = 10, pady=(15,0))
@@ -346,15 +498,16 @@ class LabelTool():
 
     def uploadDir(self):
         video = self.uploadEntry.get()
-        print(video)
-        #try:
-        #    os.system("pscp fdot@10.242.66.71:/data/labelingTool/BBox-Label-Tool/Videos "+filePath)
-        #    print("Upload Succeeded")
-        #except:
-        #    print("Upload failed")
+        self.category = video
+
+        subprocess.Popen('sh video_processing.sh %s'%(video), shell=True)
+        time.sleep(1)
+        self.galleries = [name for name in os.listdir("./Images")]
+        self.entry['values'] = self.galleries
 
 
     def LoadDir(self, dbg = False):
+
         if not dbg:
             s = self.entry.get()
             self.parent.focus()
@@ -406,11 +559,14 @@ class LabelTool():
         self.imagename = os.path.split(imagepath)[-1].split('.')[0]
         self.notCorrected = True
         newlabelname = self.imagename + '.txt.gt'
+        newcomname = self.imagename+'_com.txt.gt'
 
         self.saveImagePath = os.path.join(r'./Corrected/%s/Images' %(self.category),self.imagename+'.png')
         self.saveLabelPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),newlabelname)
+        self.saveComPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),newcomname)
         self.deleteImagePath = os.path.join(r'./Deleted/%s/Images' %(self.category),self.imagename+'.png')
         self.deleteLabelPath = os.path.join(r'./Deleted/%s/Labels' %(self.category),self.imagename+'.txt')
+        self.deleteComPath = os.path.join(r'./Deleted/%s/Labels' %(self.category),self.imagename+'_com.txt')
         #creat folder
         distutils.dir_util.mkpath(r'./Corrected/%s/Images' %(self.category))
         distutils.dir_util.mkpath(r'./Corrected/%s/Labels' %(self.category))
@@ -426,10 +582,17 @@ class LabelTool():
         else:
             labelname = self.imagename + '.txt'
             self.labelfilename = os.path.join(self.outDir, labelname)
-
             self.saveLabelPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),labelname)
-
             self.status.config(text="Not Corrected", fg="red")
+
+        self.newcomfilename = os.path.join(self.outDir, newcomname)
+        if os.path.exists(self.newcomfilename):
+            self.comfilename = self.newlabelfilename
+        else:
+            comname = self.imagename + '_com.txt'
+            self.comfilename = os.path.join(self.outDir, comname)
+            self.saveComPath = os.path.join(r'./Corrected/%s/Labels' %(self.category),comname)
+
         bbox_cnt = 0
         if os.path.exists(self.labelfilename):
             with open(self.labelfilename) as f:
@@ -458,6 +621,15 @@ class LabelTool():
                     if (len(self.bboxList)!=0):
                         self.listbox.select_set(0)
                         self.listbox.event_generate("<<ListboxSelect>>")
+
+		if os.path.exists(self.comfilename):
+			with open(self.comfilename) as f:
+				for (i, line) in enumerate(f):
+					if i == 0:
+						com_cnt = int(line.strip())
+						continue
+					tmp = line.split()
+					self.comList.append(tuple(tmp))
 
     def saveImage(self):
         self.saved=True
@@ -707,6 +879,59 @@ class LabelTool():
         else:
             self.trailersubcandidate['values'] = self.trailsub_can_temp
             self.trailersubcandidate.current(0)
+
+    def editCommoditySubtypeChoices(self, evt):
+        selectedCommodity = self.commoditycandidate.get()
+        if (selectedCommodity == 'Raw_Materials_Agriculture_Forestry_Fishing'):
+            self.subcommoditycandidate['values'] = self.Raw_Materials_Agriculture_Forestry_Fishing_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+        elif (selectedCommodity == 'Mining_Quarrying_and_Oil_and_Gas_Extraction'):
+            self.subcommoditycandidate['values'] = self.Mining_Quarrying_and_Oil_and_Gas_Extraction_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+        elif (selectedCommodity == 'Transportation_and_Other'):
+            self.subcommoditycandidate['values'] = self.Transportation_and_Other_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+        elif (selectedCommodity == 'Construction'):
+            self.subcommoditycandidate['values'] = self.Construction_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+        elif (selectedCommodity == 'Manufacturing_Poduction'):
+            self.subcommoditycandidate['values'] = self.Manufacturing_Poduction_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+        elif (selectedCommodity == 'Retail_Ready_Finished_Goods'):
+            self.subcommoditycandidate['values'] = self.Retail_Ready_Finished_Goods_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+        else:
+            self.subcommoditycandidate['values'] = self.commoditysub_can_temp
+            self.subcommoditycandidate.current(0)
+            self.subcommoditycandidate.event_generate("<<ComboboxSelected>>")
+
+    def editCommoditySubsubtypeChoices(self, evt):
+       selectedCommoditySub = self.subcommoditycandidate.get()
+       if (selectedCommoditySub == 'Crops'):
+            self.subsubcommoditycandidate['values'] = self.Crops_can_temp
+            self.subsubcommoditycandidate.current(0)
+       elif (selectedCommoditySub == 'Animal_Aquaculture'):
+            self.subsubcommoditycandidate['values'] = self.Animal_Aquaculture_can_temp
+            self.subsubcommoditycandidate.current(0)
+       elif (selectedCommoditySub == 'Mining_Except_Oil_Gas'):
+            self.subsubcommoditycandidate['values'] = self.Mining_Except_Oil_Gas_can_temp
+            self.subsubcommoditycandidate.current(0)
+       elif (selectedCommoditySub == 'Food_and_Beverages'):
+            self.subsubcommoditycandidate['values'] = self.Food_and_Beverages_can_temp
+            self.subsubcommoditycandidate.current(0)
+       elif (selectedCommoditySub == 'Plant_Products_NonEdible'):
+            self.subsubcommoditycandidate['values'] = self.Plant_Products_NonEdible_can_temp
+            self.subsubcommoditycandidate.current(0)
+       else:
+            self.subsubcommoditycandidate['values'] = self.commoditysubsub_can_temp
+            self.subsubcommoditycandidate.current(0)
+
 
     def askSaveQuestion(self):
         result = tkMessageBox.askquestion("Save Changes", "Save Changes Before Continuing?", icon="warning", type="yesnocancel")
