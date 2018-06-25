@@ -1,3 +1,8 @@
 2
+<<<<<<< HEAD
 220 66 434 150 class9 Day_Cab Chassis 40'_Chassis N N N
 26 62 327 158 class9 Sleeper Enclosed Dry_Van N N N
+=======
+223 64 437 153 class9 Day_Cab Flatbed Flatbed N N N
+29 60 330 161 class9 Sleeper Flatbed Flatbed N N N
+>>>>>>> dc993b33364adc2ebf33d2b5ad9184efd52e1458
