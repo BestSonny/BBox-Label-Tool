@@ -1,0 +1,3 @@
+Crops
+Animal_Aquaculture
+Forestry_Logging

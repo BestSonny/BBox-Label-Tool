@@ -1,0 +1,9 @@
+Food_and_Beverages
+Alcohol_Tobacco
+Plant_Products_NonEdible
+Petroleum_Coal
+Chemical_Products
+Nonmetallic_Mineral_Products
+Fabricated_Metal_Products
+Machinery
+Computer_Electronics_Products
