@@ -158,7 +158,7 @@ class LabelTool():
         self.videoGallery = StringVar()
         self.uploadEntry = ttk.Combobox(self.uploadPanel,state='readonly',textvariable=self.videoGallery)
         self.uploadEntry.pack(side = LEFT, ipadx = 56)
-        self.videoGalleries = []
+        self.videoGalleries = [name for name in os.listdir("./Videos")]
         self.uploadEntry['values'] = self.videoGalleries
         self.uploadBtn = Button(self.uploadPanel, text = "Classify", command = self.uploadDir)
         self.uploadBtn.pack(side = LEFT, ipadx = 5)
