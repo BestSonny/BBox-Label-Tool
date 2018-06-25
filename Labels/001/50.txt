@@ -1,3 +1,0 @@
-0
-462 248 554 294 truck Bed Yes Yes Yes
-381 240 470 305 truck Bed Yes Yes Yes

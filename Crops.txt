@@ -1,0 +1,11 @@
+Orange
+Other_Citrus_(except_Orange)
+Strawberry
+Berry_(except_Strawberry)
+Nursery_and_Trees
+Floriculture
+Tobacco
+Cotton
+Sugarcane
+Hay
+Peanut
