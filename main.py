@@ -215,7 +215,6 @@ class LabelTool():
         if os.path.exists(self.commodity_filename):
         	with open(self.commodity_filename) as cf:
         		for line in cf.readlines():
-        			# print line
         			self.commodity_can_temp.append(line.strip())
 
         # Choose commodity subtype
@@ -615,7 +614,7 @@ class LabelTool():
 
         # get image list
         self.imageDir = os.path.join(r'./Images', '%s' %(self.category))
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.png'))
+        self.imageList = sorted(glob.glob(os.path.join(self.imageDir, '*.png')))
 
         #print self.imageList
         if len(self.imageList) == 0:
