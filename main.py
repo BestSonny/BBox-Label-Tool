@@ -215,6 +215,103 @@ class LabelTool():
         if os.path.exists(self.commodity_filename):
         	with open(self.commodity_filename) as cf:
         		for line in cf.readlines():
+        			self.commodity_can_temp.append(line.strip())
+
+        # Choose commodity subtype
+        self.subcommoditynameLabel = Label(self.commodityEditPanel, text = 'Commodity Subtype')
+        self.subcommoditynameLabel.pack(pady = (5,1))
+        self.subcommodityname = StringVar()
+        self.subcommoditycandidate = ttk.Combobox(self.commodityEditPanel,state='readonly',textvariable=self.subcommodityname)
+        self.subcommoditycandidate.pack(fill = X, padx = 5)
+       	self.subcommoditycandidate.bind("<<ComboboxSelected>>",self.editCommoditySubsubtypeChoices)
+        if os.path.exists(self.commodity_subtype_filename):
+        	with open(self.commodity_subtype_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.commoditysub_can_temp.append(line.strip())
+        if os.path.exists(self.Raw_Materials_Agriculture_Forestry_Fishing_filename):
+        	with open(self.Raw_Materials_Agriculture_Forestry_Fishing_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Raw_Materials_Agriculture_Forestry_Fishing_can_temp.append(line.strip())
+        if os.path.exists(self.Mining_Quarrying_and_Oil_and_Gas_Extraction_filename):
+        	with open(self.Mining_Quarrying_and_Oil_and_Gas_Extraction_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Mining_Quarrying_and_Oil_and_Gas_Extraction_can_temp.append(line.strip())
+        if os.path.exists(self.Construction_filename):
+        	with open(self.Construction_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Construction_can_temp.append(line.strip())
+        if os.path.exists(self.Manufacturing_Production_filename):
+        	with open(self.Manufacturing_Production_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Manufacturing_Production_can_temp.append(line.strip())
+        if os.path.exists(self.Transportation_and_Other_filename):
+        	with open(self.Transportation_and_Other_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Transportation_and_Other_can_temp.append(line.strip())
+        if os.path.exists(self.Retail_Ready_Finished_Goods_filename):
+        	with open(self.Retail_Ready_Finished_Goods_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Retail_Ready_Finished_Goods_can_temp.append(line.strip())
+
+        # Choose commodity subsubtype
+        self.subsubcommoditynameLabel = Label(self.commodityEditPanel, text = 'Commodity Subsubtype')
+        self.subsubcommoditynameLabel.pack(pady = (5,1))
+        self.subsubcommodityname = StringVar()
+        self.subsubcommoditycandidate = ttk.Combobox(self.commodityEditPanel,state='readonly',textvariable=self.subsubcommodityname)
+        self.subsubcommoditycandidate.pack(fill = X, padx = 5)
+        if os.path.exists(self.commodity_subsubtype_filename):
+        	with open(self.commodity_subsubtype_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.commoditysubsub_can_temp.append(line.strip())
+        if os.path.exists(self.Crops_filename):
+        	with open(self.Crops_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Crops_can_temp.append(line.strip())
+        if os.path.exists(self.Animal_Aquaculture_filename):
+        	with open(self.Animal_Aquaculture_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Animal_Aquaculture_can_temp.append(line.strip())
+        if os.path.exists(self.Mining_Except_Oil_Gas_filename):
+        	with open(self.Mining_Except_Oil_Gas_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Mining_Except_Oil_Gas_can_temp.append(line.strip())
+        if os.path.exists(self.Food_and_Beverages_filename):
+        	with open(self.Food_and_Beverages_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Food_and_Beverages_can_temp.append(line.strip())
+        if os.path.exists(self.Plant_Products_NonEdible_filename):
+        	with open(self.Plant_Products_NonEdible_filename) as cf:
+        		for line in cf.readlines():
+        			# print line
+        			self.Plant_Products_NonEdible_can_temp.append(line.strip())
+
+        #Commodity and class tabs
+        self.commodities = ttk.Notebook(self.labelFrame)
+        self.commodityEditPanel = Frame(self.commodities)
+        self.commodityEditPanel.pack(pady = (5,0), padx=5, fill = BOTH)
+
+        # Choose commodity
+        self.commoditynameLabel = Label(self.commodityEditPanel, text = 'Commodity')
+        self.commoditynameLabel.pack(pady = (5,1))
+        self.commodityname = StringVar()
+        self.commoditycandidate = ttk.Combobox(self.commodityEditPanel,state='readonly',textvariable=self.commodityname)
+        self.commoditycandidate.pack(fill = X, padx = 5)
+        self.commoditycandidate.bind("<<ComboboxSelected>>",self.editCommoditySubtypeChoices)
+        if os.path.exists(self.commodity_filename):
+        	with open(self.commodity_filename) as cf:
+        		for line in cf.readlines():
         			# print line
         			self.commodity_can_temp.append(line.strip())
 
@@ -615,7 +712,7 @@ class LabelTool():
 
         # get image list
         self.imageDir = os.path.join(r'./Images', '%s' %(self.category))
-        self.imageList = glob.glob(os.path.join(self.imageDir, '*.png'))
+        self.imageList = sorted(glob.glob(os.path.join(self.imageDir, '*.png')))
 
         #print self.imageList
         if len(self.imageList) == 0:
