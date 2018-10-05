@@ -1,8 +1,8 @@
 #-------------------------------------------------------------------------------
 # Name:        Truck classification and bounding box tool
 # Purpose:     Mass labeling of truck classification data
-# Author:      Chris-Moffitt (Based on Object bounding box label tool by Qiushi)
-# Created:     06/06/2014 by Qiushi
+# Author:      Chris-Moffitt (Based on Object bounding box label tool by Pan He)
+# Created:     09/06/2017 by Pan He
 # Modified:    02/19/2018 by Chris-Moffitt
 #-------------------------------------------------------------------------------
 from __future__ import division
@@ -17,7 +17,7 @@ import random
 import distutils.dir_util
 import subprocess
 import time
-
+from natsort import natsorted
 
 # colors for the bboxes
 COLORS = ['red', 'blue', 'olive', 'teal', 'cyan', 'green', 'black']
@@ -147,7 +147,7 @@ class LabelTool():
 
         self.entry.pack(side = LEFT, ipadx = 80)
 
-        self.galleries = [name for name in os.listdir("./Images")]
+        self.galleries = [name for name in sorted(os.listdir("./Images"))]
         self.entry['values'] = self.galleries
         self.LoadBtn = Button(self.browsePanel, text = "Load", command = self.LoadDir)
         self.LoadBtn.pack(side = LEFT, ipadx = 12, padx = (1,0))
@@ -158,7 +158,7 @@ class LabelTool():
         self.videoGallery = StringVar()
         self.uploadEntry = ttk.Combobox(self.uploadPanel,state='readonly',textvariable=self.videoGallery)
         self.uploadEntry.pack(side = LEFT, ipadx = 56)
-        self.videoGalleries = [name for name in os.listdir("./Videos")]
+        self.videoGalleries = [name for name in sorted(os.listdir("./Videos"))]
         self.uploadEntry['values'] = self.videoGalleries
         self.uploadBtn = Button(self.uploadPanel, text = "Classify", command = self.uploadDir)
         self.uploadBtn.pack(side = LEFT, ipadx = 5)
@@ -181,8 +181,8 @@ class LabelTool():
         self.mainPanel.bind("<Motion>", self.mouseMove)
         self.parent.bind("<Escape>", self.cancelBBox)  # press <Espace> to cancel current bbox
         self.parent.bind("s", self.cancelBBox)
-        self.parent.bind("a", self.prevImage) # press 'a' to go backforward
-        self.parent.bind("d", self.nextImage) # press 'd' to go forward
+        self.parent.bind("b", self.prevImage) # press 'a' to go backforward
+        self.parent.bind("f", self.nextImage) # press 'd' to go forward
         self.mainPanel.pack()
 
         # showing bbox info & delete bbox
@@ -598,8 +598,8 @@ class LabelTool():
         self.category = video
 
         subprocess.Popen('sh video_processing.sh %s'%(video), shell=True)
-        time.sleep(1)
-        self.galleries = [name for name in os.listdir("./Images")]
+        time.sleep(1)            
+        self.galleries = [name for name in sorted(os.listdir("./Images"))]
         self.entry['values'] = self.galleries
 
 
@@ -614,9 +614,10 @@ class LabelTool():
 
         # get image list
         self.imageDir = os.path.join(r'./Images', '%s' %(self.category))
-        self.imageList = sorted(glob.glob(os.path.join(self.imageDir, '*.png')))
 
-        #print self.imageList
+        self.imageList = natsorted(glob.glob(os.path.join(self.imageDir, '*.png')))
+        print self.imageList
+
         if len(self.imageList) == 0:
             print 'No .png images found in the specified dir!'
             return
